@@ -1,22 +1,29 @@
 package main
 
 import (
-	"log"
+	"time"
 
-	"github.com/iamthe1whoknocks/rateLimiter/pkg/router"
+	"github.com/iamthe1whoknocks/rateLimiter/handler"
+	"github.com/iamthe1whoknocks/rateLimiter/models"
+	"golang.org/x/time/rate"
+
 	"github.com/spf13/viper"
+	"gopkg.in/labstack/echo.v4"
 )
 
 func main() {
-	if err := initConfig(); err != nil {
-		log.Fatalf("error initializating config : %s", err.Error())
-	}
+	e := echo.New()
 
-	e := router.Run()
+	rt := rate.Every(1 * time.Minute)
 
-	if err := e.Start(":8082"); err != nil {
-		log.Fatalf("error starting server : %s", err.Error())
-	}
+	limiter := rate.NewLimiter(rt, 5)
+	ipLimiter := &models.IPLimiter{Limiter: limiter}
+
+	h := &handler.Handler{Limiter: ipLimiter}
+
+	e.GET("/", h.Hello, h.Limiter.LimitMiddleware)
+
+	e.Start(":8083")
 
 }
 
