@@ -1,27 +1,28 @@
 package main
 
 import (
+	"log"
 	"time"
 
 	"github.com/iamthe1whoknocks/rateLimiter/handler"
-	"github.com/iamthe1whoknocks/rateLimiter/models"
-	"golang.org/x/time/rate"
+	"github.com/iamthe1whoknocks/rateLimiter/router"
 
 	"github.com/spf13/viper"
-	"gopkg.in/labstack/echo.v4"
 )
 
 func main() {
-	e := echo.New()
+	if err := initConfig(); err != nil {
+		log.Fatal(err.Error())
+	}
 
-	rt := rate.Every(1 * time.Minute)
+	mask := viper.GetString("mask")
+	requestLimit := viper.GetInt("request_limit")
+	t := viper.GetInt("time")
+	timeToWait := time.Duration(t) * time.Minute
 
-	limiter := rate.NewLimiter(rt, 5)
-	ipLimiter := &models.IPLimiter{Limiter: limiter}
+	h := handler.New(mask, requestLimit, timeToWait)
 
-	h := &handler.Handler{Limiter: ipLimiter}
-
-	e.GET("/", h.Hello, h.Limiter.LimitMiddleware)
+	e := router.New(h)
 
 	e.Start(":8083")
 

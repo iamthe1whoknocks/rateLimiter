@@ -1,16 +1,15 @@
 package router
 
 import (
+	"github.com/iamthe1whoknocks/rateLimiter/handler"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 )
 
-func New() *echo.Echo {
+func New(h *handler.Handler) *echo.Echo {
 
 	e := echo.New()
-	e.Use(middleware.RateLimiterWithConfig(&middleware.RateLimiterConfig{
-		
-	})
+	e.Use(h.LimitMiddleware)
+	e.GET("/", h.Hello)
 
 	return e
 }
