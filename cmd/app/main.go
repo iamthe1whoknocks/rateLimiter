@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/iamthe1whoknocks/rateLimiter/config"
 	"github.com/iamthe1whoknocks/rateLimiter/handler"
 	"github.com/iamthe1whoknocks/rateLimiter/router"
 
@@ -11,25 +12,23 @@ import (
 )
 
 func main() {
-	if err := initConfig(); err != nil {
+
+	//инициализация конфигурационного файла
+	if err := config.Init(); err != nil {
 		log.Fatal(err.Error())
 	}
 
+	//получение данных из  конфигурационного файла
 	mask := viper.GetString("mask")
 	requestLimit := viper.GetInt("request_limit")
-	t := viper.GetInt("time")
-	timeToWait := time.Duration(t) * time.Minute
+	timeToWait := time.Duration(viper.GetInt64("time"))
 
+	//Создание экземпляра handler
 	h := handler.New(mask, requestLimit, timeToWait)
 
+	//создание роутера
 	e := router.New(h)
 
-	e.Start(":8083")
+	e.Logger.Fatal(e.Start(":8083"))
 
-}
-
-func initConfig() error {
-	viper.AddConfigPath("../../configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
 }
