@@ -23,7 +23,7 @@ func GetSubnetFromIP(ip string, mask string) (string, error) {
 
 // Создание rate limiter из конфигурационных данных
 func CreateLimiter(timeToWait time.Duration, requestLimit int) (limiter *rate.Limiter) {
-	rt := rate.Every(timeToWait * time.Minute / time.Duration(requestLimit))
+	rt := rate.Every(timeToWait / time.Duration(requestLimit))
 	limiter = rate.NewLimiter(rt, requestLimit)
 	return limiter
 }

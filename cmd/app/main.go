@@ -21,7 +21,8 @@ func main() {
 	//получение данных из  конфигурационного файла
 	mask := viper.GetString("mask")
 	requestLimit := viper.GetInt("request_limit")
-	timeToWait := time.Duration(viper.GetInt64("time"))
+	//timeToWait := time.Duration(viper.GetInt64("time")*int64(time.Minute))
+	timeToWait := time.Duration(viper.GetInt("time")) * time.Minute
 
 	//Создание экземпляра handler
 	h := handler.New(mask, requestLimit, timeToWait)

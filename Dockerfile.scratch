@@ -1,0 +1,9 @@
+FROM alpine
+RUN mkdir /config
+WORKDIR /config
+COPY ./config/config.yml /config
+WORKDIR /
+COPY /cmd/app/app /
+EXPOSE 8083
+CMD ["/app"]
+

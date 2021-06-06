@@ -19,7 +19,7 @@ type Handler struct {
 	TimeToWait   time.Duration
 }
 
-//Создание нового экземпляра
+//Создание нового экземпляра обработчика
 func New(mask string, requestLimit int, time time.Duration) *Handler {
 	return &Handler{
 		Subnets:      make(map[string]*rate.Limiter),
